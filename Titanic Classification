@@ -1,0 +1,41 @@
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+
+def predict_survival(socioeconomic_status, age, gender, physical_fitness, mental_state, location, time_of_day):
+  """Predicts whether a person will be saved from sinking.
+
+  Args:
+    socioeconomic_status: The person's socioeconomic status.
+    age: The person's age.
+    gender: The person's gender.
+    physical_fitness: The person's physical fitness.
+    mental_state: The person's mental state.
+    location: The person's location.
+    time_of_day: The time of day.
+
+  Returns:
+    True if the person is predicted to be saved, False otherwise.
+  """
+
+  features = [socioeconomic_status, age, gender, physical_fitness, mental_state, location, time_of_day]
+  model = LogisticRegression()
+  model.fit(features, [1 if x else 0 for x in df['Survived']])
+  score = model.predict_proba([features])[0][0]
+
+  if score > 0.5:
+    return True
+  else:
+    return False
+
+if __name__ == "__main__":
+  df = pd.read_csv('titanic.csv')
+  socioeconomic_status = df['Socioeconomic Status'].iloc[0]
+  age = df['Age'].iloc[0]
+  gender = df['Gender'].iloc[0]
+  physical_fitness = df['Physical Fitness'].iloc[0]
+  mental_state = df['Mental State'].iloc[0]
+  location = df['Location'].iloc[0]
+  time_of_day = df['Time of Day'].iloc[0]
+
+  is_saved = predict_survival(socioeconomic_status, age, gender, physical_fitness, mental_state, location, time_of_day)
+  print("Is saved:", is_saved)
