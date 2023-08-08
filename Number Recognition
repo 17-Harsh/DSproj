@@ -1,0 +1,56 @@
+import tensorflow as tf
+
+def mnist_model(x):
+  """Builds a neural network for handwritten digit recognition.
+
+  Args:
+    x: The input image, a tensor of shape [batch_size, 28, 28, 1].
+
+  Returns:
+    The output of the neural network, a tensor of shape [batch_size, 10].
+  """
+
+  # Convolutional layers
+  x = tf.layers.conv2d(x, 32, 3, activation=tf.nn.relu)
+  x = tf.layers.max_pooling2d(x, 2, 2)
+  x = tf.layers.conv2d(x, 64, 3, activation=tf.nn.relu)
+  x = tf.layers.max_pooling2d(x, 2, 2)
+
+  # Fully connected layers
+  x = tf.reshape(x, [-1, 7*7*64])
+  x = tf.layers.dense(x, 128, activation=tf.nn.relu)
+  x = tf.layers.dropout(x, rate=0.2)
+  x = tf.layers.dense(x, 10, activation=tf.nn.softmax)
+
+  return x
+
+def main():
+  # Load the MNIST dataset.
+  (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+
+  # Convert the images to floats.
+  x_train = x_train.astype('float32')
+  x_test = x_test.astype('float32')
+
+  # Normalize the images to have mean 0 and standard deviation 1.
+  x_train /= 255.0
+  x_test /= 255.0
+
+  # Create the model.
+  model = tf.keras.Sequential([
+      mnist_model,
+      tf.keras.layers.Softmax()
+  ])
+
+  # Compile the model.
+  model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+  # Train the model.
+  model.fit(x_train, y_train, epochs=10)
+
+  # Evaluate the model on the test set.
+  score = model.evaluate(x_test, y_test, verbose=0)
+  print('Test accuracy:', score[1])
+
+if __name__ == "__main__":
+  main()
